@@ -120,12 +120,13 @@
                     <span class="text-2xl font-bold text-blue-900 font-heading">ESI<span class="text-yellow-600">.IA</span></span>
                 </div>
                 <div class="hidden md:flex space-x-8 items-center">
-                    <button onclick="scrollToSection('home')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Inicio</button>
-                    <button onclick="scrollToSection('diagnosis')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Diagnóstico</button>
-                    <button onclick="scrollToSection('ecosystem')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Ecosistema IA</button>
-                    <button onclick="scrollToSection('impact')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Impacto & ROI</button>
-                    <button onclick="scrollToSection('roadmap')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Implementación</button>
-                    <button onclick="scrollToSection('references')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Referencias</button>
+                    <!-- Added IDs to navigation buttons for Scroll Spy logic -->
+                    <button id="nav-home" onclick="scrollToSection('home')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Inicio</button>
+                    <button id="nav-diagnosis" onclick="scrollToSection('diagnosis')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Diagnóstico</button>
+                    <button id="nav-ecosystem" onclick="scrollToSection('ecosystem')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Ecosistema IA</button>
+                    <button id="nav-impact" onclick="scrollToSection('impact')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Impacto & ROI</button>
+                    <button id="nav-roadmap" onclick="scrollToSection('roadmap')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Implementación</button>
+                    <button id="nav-references" onclick="scrollToSection('references')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Referencias</button>
                 </div>
                 <!-- Mobile menu button placeholder -->
                 <div class="flex items-center md:hidden">
@@ -746,12 +747,47 @@
 
     <!-- JS Logic -->
     <script>
-        // --- 1. Navigation Logic ---
+        // --- 1. Navigation Logic & Scroll Spy ---
         function scrollToSection(id) {
             const element = document.getElementById(id);
             if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
+                // Adjust for sticky header height (approx 64px)
+                const headerOffset = 80;
+                const elementPosition = element.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth"
+                });
             }
+        }
+
+        // Active Link Highlighter
+        window.addEventListener('scroll', highlightNav);
+        // Also run on load to set initial state
+        window.addEventListener('load', highlightNav);
+
+        function highlightNav() {
+            const sections = ['home', 'diagnosis', 'ecosystem', 'impact', 'roadmap', 'references'];
+            const scrollY = window.pageYOffset;
+            
+            // Offset triggers active state slightly before the section hits the very top
+            const offset = 150; 
+
+            sections.forEach(current => {
+                const sectionHeight = document.getElementById(current).offsetHeight;
+                const sectionTop = document.getElementById(current).offsetTop - offset;
+                const navLink = document.getElementById('nav-' + current);
+
+                if (navLink) { // Check if element exists
+                    if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
+                        navLink.classList.add('nav-active');
+                    } else {
+                        navLink.classList.remove('nav-active');
+                    }
+                }
+            });
         }
 
         // --- 2. Tab Switching Logic ---
