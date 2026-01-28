@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESI - Propuesta Estratégica IA & PLN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Chosen Palette: Warm Professional
+           Background: Warm Neutral (#f8fafc to #f1f5f9)
+           Primary: Academic Navy (#1e3a8a)
+           Secondary: Excellence Gold (#c5a059)
+           Text: Slate (#334155)
+        */
+        body {
+            font-family: 'Lato', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+        }
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        /* Chart Container Styling Rules */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* Max width constraint */
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px; /* Base height */
+            max-height: 400px; /* Max height constraint */
+        }
+        
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        .nav-active {
+            border-bottom: 3px solid #c5a059;
+            color: #1e3a8a;
+            font-weight: 700;
+        }
+
+        .interactive-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Custom Scrollbar for text areas */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .step-arrow::after {
+            content: '→';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.5rem;
+            color: #cbd5e1;
+        }
+        @media (max-width: 768px) {
+            .step-arrow::after {
+                content: '↓';
+                right: 50%;
+                top: auto;
+                bottom: -25px;
+                transform: translateX(50%);
+            }
+        }
+        .step-last::after {
+            content: '';
+        }
+    </style>
+    <!-- Application Structure Plan:
+         1. Hero Section: Title and clear context setting.
+         2. Diagnosis Dashboard: Interactive counters showing the "Before" state (Infoxication/Feedback Gap).
+         3. The Solution Ecosystem (Core): Tabs to switch between SCIR (Process flow interaction) and AERA (Simulation interaction).
+         4. Strategic Impact (Data): Chart.js visualizations for ROI, Efficiency, and Adoption KPIs.
+         5. Roadmap: Interactive timeline for implementation phases.
+         6. Ethics: Accordion for governance principles.
+         7. Footer: References.
+         
+         Rationale: This structure moves from Problem -> Solution -> Proof -> Implementation, mirroring a persuasive pitch flow.
+    -->
+    
+    <!-- Visualization & Content Choices:
+         - Metrics Comparison: Bar Chart. Goal: Compare efficiency (manual vs AI). Justification: Clear visual magnitude of time saved.
+         - Process Flow (SCIR): HTML/Flexbox Boxes. Goal: Explain technical pipeline. Justification: Interactive hover explains each technical step (NER, Tokenization) without overwhelming the user.
+         - Interactive Simulation (AERA): Text Input + JS logic. Goal: Demonstrate the "Chain-of-Thought" feedback. Justification: "Show, don't tell" the AI capability.
+         - Implementation Timeline: Clickable Flex Steps. Goal: Show the 6-month plan.
+         - KPI Dashboard: Doughnut/Bar charts. Goal: Visualize success metrics (Accuracy, Satisfaction).
+         - NO SVG/Mermaid: All icons are FontAwesome (via CDN) or CSS shapes. Charts are Canvas.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+</head>
+<body class="bg-slate-50">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white shadow-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-blue-900 font-heading">ESI<span class="text-yellow-600">.IA</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <button onclick="scrollToSection('diagnosis')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Diagnóstico</button>
+                    <button onclick="scrollToSection('ecosystem')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Ecosistema IA</button>
+                    <button onclick="scrollToSection('impact')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Impacto & ROI</button>
+                    <button onclick="scrollToSection('roadmap')" class="text-slate-600 hover:text-blue-900 px-3 py-2 text-sm font-medium transition-colors">Implementación</button>
+                </div>
+                <!-- Mobile menu button placeholder -->
+                <div class="flex items-center md:hidden">
+                    <button class="text-slate-600 hover:text-blue-900 font-bold">Menu</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <div class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-blue-900 uppercase bg-blue-100 rounded-full">
+                    Propuesta Estratégica 2026
+                </div>
+                <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 leading-tight mb-6">
+                    Inteligencia Institucional para la <span class="text-blue-800">Excelencia Académica</span>
+                </h1>
+                <p class="text-lg text-slate-600 mb-8 leading-relaxed">
+                    Una propuesta integral para transformar la gestión del conocimiento y la evaluación formativa en la <strong>Escuela Superior de Innovación (ESI)</strong> mediante Procesamiento de Lenguaje Natural (PLN).
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="scrollToSection('ecosystem')" class="bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105">
+                        Explorar Solución
+                    </button>
+                    <button onclick="scrollToSection('impact')" class="bg-white hover:bg-slate-50 text-blue-900 font-bold py-3 px-8 rounded-lg border border-slate-300 shadow transition-colors">
+                        Ver Datos de Impacto
+                    </button>
+                </div>
+            </div>
+            <div class="bg-slate-100 rounded-2xl p-8 border border-slate-200 shadow-inner relative overflow-hidden">
+                <!-- Abstract Decorative Elements using CSS -->
+                <div class="absolute top-0 right-0 w-64 h-64 bg-yellow-400 opacity-5 rounded-full -mr-32 -mt-32"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-blue-800 opacity-5 rounded-full -ml-24 -mb-24"></div>
+                
+                <h3 class="text-xl font-bold text-blue-900 mb-4">Resumen Ejecutivo</h3>
+                <ul class="space-y-4">
+                    <li class="flex items-start">
+                        <span class="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-xs mt-1">1</span>
+                        <p class="ml-4 text-slate-600 text-sm"><strong>El Problema:</strong> "Infoxicación" de recursos y brecha de feedback en grandes cohortes.</p>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-xs mt-1">2</span>
+                        <p class="ml-4 text-slate-600 text-sm"><strong>La Solución:</strong> Ecosistema dual con <strong>SCIR</strong> (Gestión) y <strong>AERA</strong> (Evaluación).</p>
+                    </li>
+                    <li class="flex items-start">
+                        <span class="flex-shrink-0 h-6 w-6 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-xs mt-1">3</span>
+                        <p class="ml-4 text-slate-600 text-sm"><strong>El Resultado:</strong> Reducción del 75% en carga administrativa y feedback en &lt;5 min.</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Diagnosis Section -->
+    <section id="diagnosis" class="py-16 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-900">Diagnóstico Situacional</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
+                    El análisis de la infraestructura actual revela dos cuellos de botella críticos que limitan la escalabilidad de la oferta educativa de la ESI.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Problem Card 1 -->
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 interactive-card transition-all duration-300">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-red-700">1. Desafío de Gestión</h3>
+                        <div class="bg-red-50 text-red-700 px-3 py-1 rounded text-sm font-bold">Actualidad</div>
+                    </div>
+                    <h4 class="text-lg font-semibold text-slate-800 mb-2">"Infoxicación" Académica</h4>
+                    <p class="text-slate-600 mb-6">
+                        Repositorios masivos sin metadatos estructurados. Los docentes invierten tiempo excesivo en curación manual.
+                    </p>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                        <div class="text-sm text-slate-500 mb-1">Tiempo promedio de curación por unidad</div>
+                        <div class="text-3xl font-bold text-slate-800">45-60 <span class="text-lg font-normal text-slate-500">minutos</span></div>
+                    </div>
+                </div>
+
+                <!-- Problem Card 2 -->
+                <div class="bg-white p-8 rounded-xl shadow-sm border border-slate-200 interactive-card transition-all duration-300">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-bold text-orange-600">2. Desafío Pedagógico</h3>
+                        <div class="bg-orange-50 text-orange-600 px-3 py-1 rounded text-sm font-bold">Actualidad</div>
+                    </div>
+                    <h4 class="text-lg font-semibold text-slate-800 mb-2">Brecha de Feedback</h4>
+                    <p class="text-slate-600 mb-6">
+                        Imposibilidad física de retroalimentar a tiempo. El feedback tardío pierde hasta un 40% de efectividad pedagógica.
+                    </p>
+                    <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                        <div class="text-sm text-slate-500 mb-1">Latencia de corrección actual</div>
+                        <div class="text-3xl font-bold text-slate-800">5-7 <span class="text-lg font-normal text-slate-500">días hábiles</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Solution Ecosystem -->
+    <section id="ecosystem" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Ecosistema ESI-IA</h2>
+                <p class="text-lg text-slate-600">
+                    Una solución técnica integrada por dos módulos core diseñados para potenciar, no reemplazar, la labor docente.
+                </p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex border-b border-slate-200 mb-8">
+                <button id="tab-scir" class="px-6 py-3 text-blue-900 font-bold border-b-4 border-blue-900 focus:outline-none transition-colors" onclick="switchTab('scir')">
+                    Módulo SCIR (Gestión)
+                </button>
+                <button id="tab-aera" class="px-6 py-3 text-slate-500 hover:text-blue-900 font-medium focus:outline-none transition-colors" onclick="switchTab('aera')">
+                    Módulo AERA (Evaluación)
+                </button>
+            </div>
+
+            <!-- SCIR Content -->
+            <div id="content-scir" class="grid lg:grid-cols-3 gap-8 animate-fade-in">
+                <div class="lg:col-span-1 space-y-6">
+                    <h3 class="text-2xl font-bold text-blue-900">Sistema de Clasificación Inteligente de Recursos</h3>
+                    <p class="text-slate-600">
+                        Transforma el repositorio pasivo en una base de conocimientos activa. Utiliza <strong>Clustering No Supervisado</strong> y <strong>Reconocimiento de Entidades Nombradas (NER)</strong> para organizar el caos documental.
+                    </p>
+                    <ul class="space-y-3">
+                        <li class="flex items-center text-sm text-slate-700">
+                            <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span> Ingesta y Tokenización masiva
+                        </li>
+                        <li class="flex items-center text-sm text-slate-700">
+                            <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span> Etiquetado taxonómico automático
+                        </li>
+                        <li class="flex items-center text-sm text-slate-700">
+                            <span class="w-2 h-2 bg-yellow-500 rounded-full mr-2"></span> Búsqueda Semántica en Lenguaje Natural
+                        </li>
+                    </ul>
+                </div>
+                <div class="lg:col-span-2 bg-slate-50 rounded-xl border border-slate-200 p-6 flex flex-col justify-center">
+                    <h4 class="text-center font-bold text-slate-500 mb-6 text-sm uppercase tracking-wider">Flujo de Procesamiento de Datos</h4>
+                    <!-- Interactive Flow Diagram -->
+                    <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 relative">
+                        <!-- Step 1 -->
+                        <div class="group relative w-full md:w-1/4 step-arrow cursor-pointer" onclick="showProcessDetail('Ingesta')">
+                            <div class="bg-white border-2 border-blue-100 group-hover:border-blue-500 p-4 rounded-lg text-center transition-all">
+                                <div class="text-2xl mb-2">📄</div>
+                                <div class="font-bold text-slate-700">Ingesta</div>
+                            </div>
+                            <div class="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 left-0 w-full bg-slate-800 text-white text-xs p-2 rounded transition-opacity pointer-events-none z-10">
+                                Procesa PDFs, Word y PPTs descomponiéndolos en tokens.
+                            </div>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="group relative w-full md:w-1/4 step-arrow cursor-pointer" onclick="showProcessDetail('Analisis')">
+                            <div class="bg-white border-2 border-blue-100 group-hover:border-blue-500 p-4 rounded-lg text-center transition-all">
+                                <div class="text-2xl mb-2">🧠</div>
+                                <div class="font-bold text-slate-700">NER + Morfología</div>
+                            </div>
+                            <div class="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 left-0 w-full bg-slate-800 text-white text-xs p-2 rounded transition-opacity pointer-events-none z-10">
+                                Identifica autores, fechas y conceptos clave automáticamente.
+                            </div>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="group relative w-full md:w-1/4 step-arrow cursor-pointer" onclick="showProcessDetail('Taxonomia')">
+                            <div class="bg-white border-2 border-blue-100 group-hover:border-blue-500 p-4 rounded-lg text-center transition-all">
+                                <div class="text-2xl mb-2">🏷️</div>
+                                <div class="font-bold text-slate-700">Taxonomía</div>
+                            </div>
+                            <div class="absolute opacity-0 group-hover:opacity-100 bottom-full mb-2 left-0 w-full bg-slate-800 text-white text-xs p-2 rounded transition-opacity pointer-events-none z-10">
+                                Clustering no supervisado para agrupar por temas.
+                            </div>
+                        </div>
+                        <!-- Step 4 -->
+                        <div class="group relative w-full md:w-1/4 step-last cursor-pointer" onclick="showProcessDetail('Repositorio')">
+                            <div class="bg-blue-900 border-2 border-blue-900 text-white p-4 rounded-lg text-center shadow-lg">
+                                <div class="text-2xl mb-2">📂</div>
+                                <div class="font-bold">Repositorio Activo</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="process-detail-text" class="mt-8 p-4 bg-blue-50 rounded border border-blue-100 text-blue-900 text-sm text-center italic">
+                        Pase el cursor sobre los pasos o haga clic para ver detalles técnicos.
+                    </div>
+                </div>
+            </div>
+
+            <!-- AERA Content (Hidden by default) -->
+            <div id="content-aera" class="hidden grid lg:grid-cols-2 gap-12 animate-fade-in">
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-blue-900">Asistente de Evaluación y Retroalimentación Automática</h3>
+                    <p class="text-slate-600">
+                        Provee corrección formativa inmediata utilizando modelos AES (Automated Essay Scoring) y <strong>Chain-of-Thought</strong>.
+                    </p>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                        <h5 class="font-bold text-yellow-800 text-sm mb-1">Human-in-the-loop</h5>
+                        <p class="text-yellow-700 text-sm">La IA propone, el docente dispone. AERA nunca asigna una nota final vinculante sin supervisión.</p>
+                    </div>
+                    <div class="space-y-4 pt-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">1</div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-slate-800">Análisis Semántico</h4>
+                                <p class="text-sm text-slate-600">Evalúa coherencia y argumentación, no solo ortografía.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">2</div>
+                            <div class="ml-4">
+                                <h4 class="font-bold text-slate-800">Feedback Formativo (CoT)</h4>
+                                <p class="text-sm text-slate-600">Explica al alumno <em>por qué</em> y <em>cómo</em> mejorar.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Simulation -->
+                <div class="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden flex flex-col h-full">
+                    <div class="bg-slate-100 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
+                        <span class="font-bold text-slate-700 text-sm">Simulador AERA (Demo)</span>
+                        <span class="text-xs text-slate-500">Modelo: ESI-GPT-Edu</span>
+                    </div>
+                    <div class="p-4 flex-grow flex flex-col">
+                        <label class="text-xs font-bold text-slate-500 uppercase mb-2">Ensayo del Estudiante (Input)</label>
+                        <textarea id="essay-input" class="w-full p-3 bg-slate-50 border border-slate-300 rounded text-sm text-slate-700 focus:outline-none focus:border-blue-500 transition-colors h-32 resize-none" placeholder="Escriba un breve párrafo sobre ética en IA para probar el feedback..."></textarea>
+                        
+                        <div class="mt-4 flex justify-end">
+                            <button onclick="simulateFeedback()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold py-2 px-4 rounded transition-colors flex items-center">
+                                <span id="btn-text">Generar Evaluación</span>
+                                <span id="btn-spinner" class="hidden ml-2 w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                            </button>
+                        </div>
+
+                        <div id="feedback-result" class="mt-4 hidden border-t border-slate-100 pt-4">
+                            <label class="text-xs font-bold text-blue-600 uppercase mb-2 block">AERA Feedback (Output)</label>
+                            <div class="bg-blue-50 p-3 rounded text-sm text-slate-800 space-y-2 h-40 overflow-y-auto">
+                                <p><strong>Evaluación Preliminar:</strong> <span class="text-yellow-600 font-bold">B (En desarrollo)</span></p>
+                                <p><strong>Análisis:</strong> El texto menciona conceptos clave, pero carece de conexión lógica entre la premisa y la conclusión.</p>
+                                <p><strong>Sugerencia de Mejora:</strong> Intenta utilizar conectores causales para reforzar tu argumento sobre la privacidad.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact & Analytics Section -->
+    <section id="impact" class="py-16 bg-slate-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12 text-center">
+                <h2 class="text-3xl font-bold text-slate-900">Evaluación y Retorno de Inversión</h2>
+                <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
+                    Medición basada en KPIs operativos, pedagógicos y técnicos.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 items-start">
+                
+                <!-- Chart 1: Efficiency Comparison -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">Eficiencia Operativa: Búsqueda de Recursos</h3>
+                    <p class="text-sm text-slate-500 mb-6">Comparativa de tiempo (minutos) por unidad temática.</p>
+                    <div class="chart-container">
+                        <canvas id="efficiencyChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center text-sm text-slate-600 bg-green-50 p-2 rounded">
+                        Impacto: <strong>75-80%</strong> de ahorro en tiempo docente.
+                    </div>
+                </div>
+
+                <!-- Chart 2: Success Metrics Projections -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800 mb-2">Proyección de Calidad Pedagógica</h3>
+                    <p class="text-sm text-slate-500 mb-6">Métricas esperadas tras fase de calibración (Mes 4).</p>
+                    <div class="chart-container">
+                        <canvas id="kpiChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center text-sm text-slate-600 bg-blue-50 p-2 rounded">
+                        Precisión Objetivo (F1-Score): <strong>>92%</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Implementation Roadmap -->
+    <section id="roadmap" class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-slate-900 mb-12 text-center">Hoja de Ruta: 6 Meses</h2>
+            
+            <div class="relative">
+                <!-- Timeline Line -->
+                <div class="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-slate-200 hidden md:block"></div>
+                
+                <div class="space-y-12">
+                    <!-- Phase 1 -->
+                    <div class="relative flex flex-col md:flex-row items-center">
+                        <div class="flex-1 md:text-right md:pr-8 mb-4 md:mb-0">
+                            <h3 class="text-xl font-bold text-blue-900">Fase 1: Piloto SCIR</h3>
+                            <span class="text-sm font-bold text-yellow-600 uppercase tracking-wide">Mes 1-2</span>
+                            <p class="mt-2 text-slate-600 text-sm">Implementación del módulo de gestión en una facultad. Indexación del repositorio histórico.</p>
+                        </div>
+                        <div class="w-8 h-8 bg-blue-900 rounded-full border-4 border-white shadow z-10 flex-shrink-0"></div>
+                        <div class="flex-1 md:pl-8 mt-4 md:mt-0">
+                            <div class="bg-slate-50 p-4 rounded border border-slate-200 text-sm">
+                                <strong>Entregable:</strong> Repositorio funcional y navegable semánticamente.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phase 2 -->
+                    <div class="relative flex flex-col md:flex-row items-center">
+                        <div class="flex-1 md:text-right md:pr-8 order-1 md:order-1 mb-4 md:mb-0">
+                             <div class="bg-slate-50 p-4 rounded border border-slate-200 text-sm md:ml-auto md:mr-0">
+                                <strong>Entregable:</strong> Modelo ajustado a rúbrica ESI con precisión >85%.
+                            </div>
+                        </div>
+                        <div class="w-8 h-8 bg-blue-900 rounded-full border-4 border-white shadow z-10 flex-shrink-0 order-2 md:order-2"></div>
+                        <div class="flex-1 md:pl-8 mt-4 md:mt-0 order-3 md:order-3">
+                           <h3 class="text-xl font-bold text-blue-900">Fase 2: Calibración AERA</h3>
+                            <span class="text-sm font-bold text-yellow-600 uppercase tracking-wide">Mes 3-4</span>
+                            <p class="mt-2 text-slate-600 text-sm">Entrenamiento con ensayos históricos anonimizados. Ajuste fino de parámetros éticos.</p>
+                        </div>
+                    </div>
+
+                    <!-- Phase 3 -->
+                    <div class="relative flex flex-col md:flex-row items-center">
+                        <div class="flex-1 md:text-right md:pr-8 mb-4 md:mb-0">
+                            <h3 class="text-xl font-bold text-blue-900">Fase 3: Despliegue Total</h3>
+                            <span class="text-sm font-bold text-yellow-600 uppercase tracking-wide">Mes 5-6</span>
+                            <p class="mt-2 text-slate-600 text-sm">Activación en modo "sombra" (asistente) para todos los docentes.</p>
+                        </div>
+                        <div class="w-8 h-8 bg-blue-900 rounded-full border-4 border-white shadow z-10 flex-shrink-0"></div>
+                        <div class="flex-1 md:pl-8 mt-4 md:mt-0">
+                            <div class="bg-slate-50 p-4 rounded border border-slate-200 text-sm">
+                                <strong>Entregable:</strong> Sistema de feedback activo con latencia &lt;5 min.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Ethics Section -->
+    <section class="py-12 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 class="text-2xl font-bold mb-8">Compromiso Ético y Privacidad</h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="p-6 bg-slate-800 rounded-lg border border-slate-700">
+                    <div class="text-yellow-500 text-2xl mb-3">👁️</div>
+                    <h4 class="font-bold mb-2">Supervisión Humana</h4>
+                    <p class="text-slate-400 text-sm">La IA es un asistente, nunca un juez. El docente valida toda evaluación.</p>
+                </div>
+                <div class="p-6 bg-slate-800 rounded-lg border border-slate-700">
+                    <div class="text-yellow-500 text-2xl mb-3">🔒</div>
+                    <h4 class="font-bold mb-2">Privacidad por Diseño</h4>
+                    <p class="text-slate-400 text-sm">Anonimización total de datos estudiantiles antes del procesamiento.</p>
+                </div>
+                <div class="p-6 bg-slate-800 rounded-lg border border-slate-700">
+                    <div class="text-yellow-500 text-2xl mb-3">📖</div>
+                    <h4 class="font-bold mb-2">Transparencia (XAI)</h4>
+                    <p class="text-slate-400 text-sm">Explicabilidad algorítmica: el sistema explica por qué sugiere una nota.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t border-slate-200 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0 text-slate-500 text-sm">
+                © 2026 Maestría en Inteligencia Artificial y Educación Digital - CESUMA
+            </div>
+            <div class="text-slate-400 text-xs text-right">
+                <p>Referencias: Delso Vicente et al. (2024), Hattie & Timperley (2007), MDPI (2025).</p>
+                <p>Presentado a Autoridades Directivas ESI.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JS Logic -->
+    <script>
+        // --- 1. Navigation Logic ---
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth' });
+            }
+        }
+
+        // --- 2. Tab Switching Logic ---
+        function switchTab(tabName) {
+            // Update buttons
+            document.getElementById('tab-scir').className = tabName === 'scir' 
+                ? "px-6 py-3 text-blue-900 font-bold border-b-4 border-blue-900 focus:outline-none transition-colors"
+                : "px-6 py-3 text-slate-500 hover:text-blue-900 font-medium focus:outline-none transition-colors";
+            
+            document.getElementById('tab-aera').className = tabName === 'aera'
+                ? "px-6 py-3 text-blue-900 font-bold border-b-4 border-blue-900 focus:outline-none transition-colors"
+                : "px-6 py-3 text-slate-500 hover:text-blue-900 font-medium focus:outline-none transition-colors";
+
+            // Update Content
+            const scirContent = document.getElementById('content-scir');
+            const aeraContent = document.getElementById('content-aera');
+
+            if (tabName === 'scir') {
+                scirContent.classList.remove('hidden');
+                aeraContent.classList.add('hidden');
+            } else {
+                scirContent.classList.add('hidden');
+                aeraContent.classList.remove('hidden');
+            }
+        }
+
+        // --- 3. SCIR Diagram Interaction ---
+        function showProcessDetail(step) {
+            const detailBox = document.getElementById('process-detail-text');
+            let text = "";
+            switch(step) {
+                case 'Ingesta':
+                    text = "<strong>Ingesta:</strong> El sistema conecta con repositorios digitales (Google Drive, Moodle) y extrae texto plano de formatos PDF, DOCX y PPTX, eliminando ruido visual.";
+                    break;
+                case 'Analisis':
+                    text = "<strong>Análisis NLP:</strong> Aplica modelos de lenguaje para identificar Entidades Nombradas (Autores, Teorías) y analiza la estructura morfológica para determinar la complejidad del texto.";
+                    break;
+                case 'Taxonomia':
+                    text = "<strong>Taxonomía:</strong> Algoritmos de Clustering agrupan documentos por similitud semántica, asignando etiquetas automáticas (ej: 'Ética', 'Programación') sin intervención humana.";
+                    break;
+                case 'Repositorio':
+                    text = "<strong>Repositorio Activo:</strong> Interfaz final donde el docente puede buscar 'casos de estudio de ética' y recibir resultados precisos en <3 segundos.";
+                    break;
+                default:
+                    text = "Pase el cursor sobre los pasos para ver detalles técnicos.";
+            }
+            detailBox.innerHTML = text;
+        }
+
+        // --- 4. AERA Simulation Logic ---
+        function simulateFeedback() {
+            const btnText = document.getElementById('btn-text');
+            const spinner = document.getElementById('btn-spinner');
+            const resultBox = document.getElementById('feedback-result');
+            const inputVal = document.getElementById('essay-input').value.trim();
+
+            // UI Loading State
+            btnText.innerText = "Analizando...";
+            spinner.classList.remove('hidden');
+            resultBox.classList.add('hidden');
+
+            // Simulated Latency
+            setTimeout(() => {
+                btnText.innerText = "Generar Evaluación";
+                spinner.classList.add('hidden');
+                resultBox.classList.remove('hidden');
+                
+                // Determine response based on input
+                let feedbackHtml = "";
+                
+                if (inputVal === "") {
+                    // Error case: Empty input
+                     feedbackHtml = `
+                        <div class="bg-red-50 p-3 rounded text-sm text-red-800 border border-red-200">
+                            <p class="font-bold mb-1">⚠️ Entrada Vacía</p>
+                            <p>Por favor, ingrese un texto en el campo superior para que AERA pueda realizar el análisis. El sistema no puede evaluar un documento vacío.</p>
+                        </div>
+                     `;
+                } else if (inputVal.length < 30) {
+                     // Error case: Too short
+                     feedbackHtml = `
+                        <div class="bg-orange-50 p-3 rounded text-sm text-orange-800 border border-orange-200">
+                            <p class="font-bold mb-1">⚠️ Texto Insuficiente</p>
+                            <p>El texto es demasiado corto para un análisis semántico fiable. Por favor, intente desarrollar más su idea (mínimo una oración completa).</p>
+                        </div>
+                     `;
+                } else {
+                    // Generic response for valid user input
+                     feedbackHtml = `
+                        <p class="mb-2"><strong>Evaluación Preliminar:</strong> <span class="text-blue-600 font-bold">A- (Muy Bien)</span></p>
+                        <p class="mb-2"><strong>Análisis (Chain-of-Thought):</strong> Has estructurado tus ideas con claridad. El uso de terminología técnica es adecuado. Detecto una buena conexión entre la teoría y la práctica.</p>
+                        <p class="mb-2"><strong>Sugerencia de Mejora:</strong> Podrías fortalecer la conclusión resumiendo los dos puntos principales mencionados en el segundo párrafo.</p>
+                        <p class="text-xs text-slate-400 mt-2"><em>Detección de Plagio: 2% similitud (Citas detectadas).</em></p>
+                     `;
+                }
+                
+                resultBox.querySelector('div').innerHTML = feedbackHtml;
+                
+            }, 1000);
+        }
+
+        // --- 5. Chart Initialization ---
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Efficiency Chart
+            const ctxEfficiency = document.getElementById('efficiencyChart').getContext('2d');
+            new Chart(ctxEfficiency, {
+                type: 'bar',
+                data: {
+                    labels: ['Búsqueda Manual (Actual)', 'Búsqueda SCIR (Meta)'],
+                    datasets: [{
+                        label: 'Minutos por Unidad Temática',
+                        data: [52.5, 8], // Averages from report (45-60 vs <10)
+                        backgroundColor: ['#ef4444', '#1e3a8a'],
+                        borderRadius: 6,
+                        barThickness: 50
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.raw + ' minutos';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Minutos' }
+                        }
+                    }
+                }
+            });
+
+            // KPI Projections Chart
+            const ctxKPI = document.getElementById('kpiChart').getContext('2d');
+            new Chart(ctxKPI, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Precisión (F1-Score)', 'Tasa Aceptación Docente', 'Satisfacción Estudiantil (Mejora)'],
+                    datasets: [{
+                        data: [92, 85, 20],
+                        backgroundColor: ['#1e3a8a', '#c5a059', '#64748b'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { usePointStyle: true, padding: 20 }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.raw + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
